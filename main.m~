@@ -1,0 +1,28 @@
+clear all; close all; clc;
+
+
+
+for a = 1: 10;
+    for b = 1:10;
+        % set signal and noise 
+        signal.big = a;
+        signal.small = a;
+        noise.big = b;
+        noise.small = b;
+        
+        % fit normalized and raw model 
+        [out, finalBeta] = simNormalizedVsRaw(signal, noise);
+        betaDiff(a,b) = out.diff;
+        raw.sec1OverSec2 = out.raw.sec1 / out.raw.sec2
+    end
+end
+
+
+%% plot 
+imagesc(betaDiff)
+colormap jet
+colorbar
+FS = 14;
+title('Beta difference normalized vs. un-normalized', 'fontsize',FS)
+xlabel('noise magnitude', 'fontsize',FS)
+ylabel('signal magnitude', 'fontsize',FS)
