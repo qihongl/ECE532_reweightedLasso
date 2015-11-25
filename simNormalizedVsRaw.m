@@ -7,10 +7,10 @@ y = [ones(m/2,1); -ones(m/2,1)];    % set true labels
 
 % parameter
 section = 50; 
-% noise.big = 10;
-% noise.small = 10;
-% signal.big = 5;
-% signal.small = 5;
+noise.big = 10;
+noise.small = 10;
+signal.big = 10;
+signal.small = 10;
 
 
 %% generate data
