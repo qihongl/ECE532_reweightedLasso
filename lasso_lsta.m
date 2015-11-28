@@ -64,6 +64,3 @@ tolerance = 1e-6;
 % calculate number of "zeros"
 nz = sum(abs(beta) <= tolerance);
 end
-
-
-
