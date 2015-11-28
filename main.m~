@@ -1,0 +1,24 @@
+
+% pre-set some parameters that I want to try
+NOISE_LEVEL = 0:0.2:2;
+PROP_USEFUL_VOX = 0.05:0.05:0.5;
+
+
+out = cell(numel(PROP_USEFUL_VOX),numel(NOISE_LEVEL));
+% check difference between raw lasso vs. normalized lasso
+for i = 1 : numel(PROP_USEFUL_VOX)
+    for j = 1: numel(NOISE_LEVEL)
+        out{i,j} = simNormVsRaw_u(PROP_USEFUL_VOX(i), NOISE_LEVEL(j));
+    end
+end
+
+
+for i = 1 : numel(PROP_USEFUL_VOX)
+    for j = 1: numel(NOISE_LEVEL)
+        norm(out{i,1}.beta.raw - out{1,1}.beta.normal)
+    end
+end
+
+
+
+
