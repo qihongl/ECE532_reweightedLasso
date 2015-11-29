@@ -1,5 +1,5 @@
 %% iterative soft thresholding to lasso
-function [beta, record] = ridge_lsta(X, y, lambda, tau, display)
+function [beta, record] = ridge_landweber(X, y, lambda, tau, display)
 %% set some parameters
 maxIter = 10000;   % maxiteration that the program will run
 tolerance = 1e-3;

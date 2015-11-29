@@ -13,7 +13,7 @@ y(y == 0) = -1;
 
 %% normalize the features
 % m = numPics, n = numVoxels
-X_n = columnNormalization(X);
+Xn = columnNormalization(X);
 
 %% 
 % cv
@@ -36,17 +36,17 @@ tau = .9 / norm(X,2)^2;
 tau_n = .9 / norm(Xn,2)^2;
 
 %% fit the model 
-[beta, record] = lasso_lsta(Xtrain, ytrain, lambda, tau, 1);
-[beta_n, record_n] = lasso_lsta(Xntrain, ytrain, lambda, tau_n, 1);
+[beta.raw, ~] = lasso_q(Xtrain, ytrain, lambda, tau, 0, 1);
+[beta.normal, ~] = lasso_q(Xntrain, ytrain, lambda, tau_n, 0, 1);
 
 % generate prediction  
-predict = sign(Xtest * beta(:,end)); 
-predict_n = sign(Xntest * beta_n(:,end)); 
+predict = sign(Xtest * beta.raw(:,end)); 
+predict_n = sign(Xntest * beta.normal(:,end)); 
 
 accuracy = sum(bsxfun(@eq, predict, ytest))/testSize
 accuracy_n = sum(bsxfun(@eq, predict_n, ytest))/testSize
 
 %% print some results
-plot(beta(:,end), beta_n(:,end), 'o')
-fprintf('Difference in norm %f \n', norm(beta(:,end)-beta_n(:,end),1));
-fprintf('Number of zero weights (raw vs. nor): %d %d\n', sum(beta(:,end)==0), sum(beta_n(:,end)==0));
+plot(beta.raw(:,end), beta.normal(:,end), 'o')
+fprintf('Difference in norm %f \n', norm(beta.raw(:,end) - beta.normal(:,end),1));
+fprintf('Number of zero weights (raw vs. nor): %d %d\n', sum(beta.raw(:,end)==0), sum(beta.normal(:,end)==0));
