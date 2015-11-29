@@ -1,10 +1,9 @@
 %% iterative soft thresholding to lasso
-function [finalBeta, history] = lasso_q(X, y, lambda, tau, display, algorithm)
-
+function [finalBeta, history] = lasso_q(X, y, lambda, tau, reWeight,display)
 %% set some parameters
 [m,n] = size(X);
-maxIter = 10000;   % maxiteration that the program will run
-tolerance = 1e-5;
+maxIter = 1000;   % maxiteration that the program will run
+tolerance = 1e-3;
 
 %% pre-compute things that need to be computed many times
 XTy = X' * y;
@@ -14,18 +13,16 @@ beta = zeros(n,1);
 if display
     fprintf('iter\taccuracy\tdiff_beta\tnnz\n');
 end
+W = ones(n,1);
 for i = 1 : maxIter;
-    %% update weight
-    if strcmp(algorithm,'gd')
-        % gradient decent 
-        grad = - 2 * XTy + 2 * XTX * beta(:,i) + lambda * sign(beta(:,i));
-        beta(:,i+1) = beta(:,i) -  tau * grad;
-    elseif strcmp(algorithm,'ista')
-        % iterative soft thresholding 
-        Z = beta(:,i) - tau*XTX * beta(:,i) +  tau*XTy;
-        beta(:,i+1) = sign(Z) .* max((Z - 2*lambda*tau), 0);
-    else
-        error('unrecognized input parameter');
+    %% update parameter estimation 
+    % iterative soft thresholding
+    Z = beta(:,i) - tau * XTX * beta(:,i) +  tau * XTy;
+    beta(:,i+1) = sign(Z) .* max((Z - 2 * lambda * tau * W), 0);
+    if reWeight
+        errors = min(beta(:,i+1)) .* rand(n,1);
+        % update weights 
+        W = 1 ./ (abs(beta(:,i+1)) + errors); 
     end
     %% Performance monitoring
     % compute change in beta
@@ -71,4 +68,9 @@ function [nz] = numZeros(beta)
 tolerance = 1e-6;
 % calculate number of "zeros"
 nz = sum(abs(beta) <= tolerance);
+end
+
+% input: column vector of beta
+function [wts] = computeWts(beta)
+wts = 1 ./ abs(beta);
 end
