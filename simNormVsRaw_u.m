@@ -23,12 +23,11 @@ tau = 1 / norm(X,2)^2;
 lambda = 1;
 
 % fit lasso to raw data
-[~, ~, beta.raw] = lasso_lsta(X, y, lambda, tau, 0);
+[beta.raw] = lasso_ista(X, y, lambda, 0);
+% [beta.rawrw] = lasso_q(X, y, lambda, tau, true, 0);
 % fit lasso to normalized data
-[~, ~, beta.normal] = lasso_lsta(X_n, y, lambda, tau_n, 0);
-
-%% reweight by variance structure
-diag(cov(X));
+[beta.normal] = lasso_ista(X_n, y, lambda, 0);
+% [beta.normalrw] = lasso_q(X_n, y, lambda, tau_n, true, 0);
 
 %% compute some useful indicators
 out.beta = beta;
@@ -42,23 +41,4 @@ out.yDevation.norm = norm(y - X_n * beta.normal,2);
 out.betaDevation.raw = norm(beta.raw - beta.truth,2);
 out.betaDevation.norm = norm(beta.normal - beta.truth,2);
 
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%% Helper functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% generate a beta vector
-% input:    total number of features
-%           number of informative features
-%           the magnitude of the signal
-% output:   a beta vector that statisfy you choices
-function beta = generateBeta(numInfoFeatures, numTotalFeatures)
-% generate the subset indices
-temp = randperm(numTotalFeatures);
-index = temp(1 : numInfoFeatures);
-% set most of the beta to zero
-beta = zeros(numTotalFeatures,1);
-% set a subset of them to be randn
-beta(index) = randn(size(index));
 end

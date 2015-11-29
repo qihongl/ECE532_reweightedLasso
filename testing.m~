@@ -1,0 +1,19 @@
+clear variables; close all; clc
+load('data/BreastCancer.mat')
+[m,n] = size(X);
+lambda = 1;
+
+
+weights = ones(n,1);
+for i = 1 : 10
+beta = lasso_ista(X, y, lambda, weights, 0);
+
+errors = abs(min(beta) .* rand(n,1));
+% update weights
+weights = 1 ./ (abs(beta) + errors);
+
+
+history.beta(:,i) = beta; 
+accuracy = sum(sign(X * beta) == y) / length(y);
+fprin
+end
