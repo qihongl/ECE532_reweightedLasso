@@ -5,28 +5,14 @@ n = 520;        % num voxels
 
 % generate X
 X = randn(m,n);
-% generate beta
+% generate beta and y 
 beta.truth = generateBeta(130, n);
-noise = 1 .* randn(m,1);
 y = X * beta.truth;
 
-[m,n] = size(X);
+%% iteratively fitting reweighted-lasso
 lambda = 1;
+[beta.rw, history] = reweightedLasso(X, y, lambda, 1);
 
-weights = ones(n,1);
-for i = 1 : 10
-% fit lasso
-beta.rw = lasso_ista(X, y, lambda, weights, 0);
-% update weights
-errors = .1;
-weights = 1 ./ (abs(beta.rw) + errors);
-
-% record beta history 
-history.weights(:,i) = weights;
-history.beta(:,i) = beta.rw; 
-diff = norm(beta.rw - beta.truth, inf);
-fprintf('%d\t%f\n',i,diff);
-end
-
-plot(beta.truth, history.beta(:,10), 'o')
+% display the final signal reconstruction alignment
+plot(beta.truth, history.beta(:,end), 'o')
 
