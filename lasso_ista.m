@@ -2,7 +2,7 @@
 function [beta] = lasso_ista(X, y, lambda, weights, display)
 % constants
 MAX_ITERS = 1e4;     % maximum number of iterations % convergence tolerance
-TOLERANCE = 1e-5;
+TOLERANCE = 1e-3;
 tau = .9 / norm(X)^2;  % choose stepsize
 [~,n] = size(X);
 
@@ -10,15 +10,12 @@ beta = zeros(n,1);          % preallocate
 XTX = X' * X;               % precompute matrix operations
 XTy = X' * y;
 
-% w = ones(n,1);
-w = weights; 
-
-% iterative soft-thresholding
+%% iterative soft-thresholding
 for i = 1: MAX_ITERS
     % parameter update with landweber iteration
     z = beta - tau * (XTX * beta - XTy);
     betaPrev = beta;
-    beta = sign(z) .* max( abs(z) - tau * lambda * w / 2, 0 );
+    beta = sign(z) .* max( abs(z) - tau * lambda * weights / 2, 0 );
     
     % compute change
     if norm(beta - betaPrev) < TOLERANCE
