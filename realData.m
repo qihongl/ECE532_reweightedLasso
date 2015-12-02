@@ -17,7 +17,7 @@ Xn = columnNormalization(X);
 
 %% 
 % cv
-testSize = 50;
+testSize = 100;
 testIdx = false(m,1);
 testIdx(1:testSize) = true;
 
@@ -30,14 +30,17 @@ ytest = y(testIdx);
 Xntrain = Xn(~testIdx,:);
 Xntest = Xn(testIdx,:);
 
-% set params
-lambda = 1; 
-tau = .9 / norm(X,2)^2;
-tau_n = .9 / norm(Xn,2)^2;
 
 %% fit the model 
-[beta.raw, ~] = lasso_q(Xtrain, ytrain, lambda, tau, 0, 1);
-[beta.normal, ~] = lasso_q(Xntrain, ytrain, lambda, tau_n, 0, 1);
+% set params
+lambda = 1; 
+weights = ones(n,1);
+[beta.raw] = lasso_ista(Xtrain, ytrain, lambda, weights, 0);
+[beta.rawrw] = reweightedLasso(Xtrain, ytrain, lambda, 1);
+
+[beta.normal] = lasso_ista(Xntrain, ytrain, lambda, weights, 0);
+[beta.normalrw] = reweightedLasso(Xntrain, ytrain, lambda, 1);
+
 
 % generate prediction  
 predict = sign(Xtest * beta.raw(:,end)); 
