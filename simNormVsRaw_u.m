@@ -15,19 +15,13 @@ y = X * beta.truth + noise;
 X_n = columnNormalization(X);
 
 %% fit the model
-% parameters for normalize data
-tau_n = 1 / norm(X_n,2)^2;
-% parameters for the raw data
-tau = 1 / norm(X,2)^2;
 % TODO: maybe we should tune the lambda for both methods here
 lambda = 1;
-
+weights = ones(n,1);
 % fit lasso to raw data
-[beta.raw] = lasso_ista(X, y, lambda, 0);
-% [beta.rawrw] = lasso_q(X, y, lambda, tau, true, 0);
+[beta.raw] = lasso_ista(X, y, lambda, weights, 0);
 % fit lasso to normalized data
-[beta.normal] = lasso_ista(X_n, y, lambda, 0);
-% [beta.normalrw] = lasso_q(X_n, y, lambda, tau_n, true, 0);
+[beta.normal] = lasso_ista(X_n, y, lambda, weights, 0);
 
 %% compute some useful indicators
 out.beta = beta;
