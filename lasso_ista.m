@@ -2,8 +2,8 @@
 function [beta] = lasso_ista(X, y, lambda, weights, display)
 % constants
 MAX_ITERS = 1e4;     % maximum number of iterations % convergence tolerance
-TOLERANCE = 1e-3;
-tau = .9 / norm(X)^2;  % choose stepsize
+TOLERANCE = 1e-5;
+tau = .99 / norm(X)^2;  % choose stepsize
 [~,n] = size(X);
 
 beta = zeros(n,1);          % preallocate
@@ -17,14 +17,16 @@ for i = 1: MAX_ITERS
     betaPrev = beta;
     beta = sign(z) .* max( abs(z) - tau * lambda * weights / 2, 0 );
     
+    
+    % display progress
+    if display
+        fprintf('Iter: %4d \t yDev: %f \t betaChange: %f\n', i, norm(y - X*beta,2), norm(beta - betaPrev));
+    end
     % compute change
     if norm(beta - betaPrev) < TOLERANCE
         break
     end
-    % display progress
-    if display
-        fprintf('%4d \t %f \t %f\n', i, norm(y - X*beta,2),norm(beta - betaPrev));
-    end
+    
 end
 
 end
