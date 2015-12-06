@@ -8,7 +8,6 @@ y = X * beta.truth;
 [m,n] = size(X);
 
 % 
-wts = ones(n,1);
 lambda = 1;
 wts = [3 1 3]';
 
@@ -27,6 +26,3 @@ struct2array(beta)
 
 sum(y == sign(X * beta.cvx)) / length(y)
 
-numNonZeros(beta.cvx)
-
-plot(beta.cvx, beta.truth, 'o')
