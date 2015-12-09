@@ -1,4 +1,5 @@
-clear variables; close all; clc
+function [dev, nnzs] = sim_Emmanuel02_cvx()
+% clear variables; close all; clc
 % stimuli by voxel
 m = 256;        % num stimuli
 n = 512;        % num voxels
@@ -7,60 +8,30 @@ n = 512;        % num voxels
 X = randn(m,n);
 % generate beta and y
 beta.truth = generateBeta(130, n, 1);
-% noise = randn(m,1);
-y = X * beta.truth;
+noise = randn(m,1) * .1;
+y = X * beta.truth + noise;
 
 %% fitting reweighted-lasso 
-[beta.rw history] = reweightedLasso_cvx(X,y);
+[beta.rw history] = reweightedLasso_cvx(X,y, 1e-6);
 % fit regular lasso
 beta.lasso = lasso_ista(X,y,1,ones(n,1),0);
 
+beta.ls = pinv(X) * y; 
 
 %%
-numNonZeros(beta.rw)
-numNonZeros(beta.lasso)
+nnzs.rw = numNonZeros(beta.rw);
+nnzs.lasso = numNonZeros(beta.lasso);
+nnzs.ls = numNonZeros(beta.ls);
+
+dev.beta.rw = norm(beta.truth - beta.rw);
+dev.beta.lasso = norm(beta.truth - beta.lasso);
+dev.beta.ls = norm(beta.truth - beta.ls);
+
+dev.y.rw1 = norm(y - X * history.beta(:,1));
+dev.y.rw = norm(y - X * beta.rw);
+dev.y.lasso = norm(y - X * beta.lasso); 
+dev.y.ls = norm(y - X * beta.ls);
 
 %% paper plot 
-FS = 14; 
-subplot(2,2,1)
-plot(beta.truth, beta.rw, 'o')
-title('True beta vs. estimated beta with reweighted lasso', 'fontsize', FS)
-xlabel('True beta values', 'fontsize', FS)
-ylabel('Estimated beta with reweighted lasso', 'fontsize', FS)
-hold on 
-range = min(beta.truth):0.1:max(beta.truth);
-plot(range,range)
-hold off
-
-
-subplot(2,2,2)
-% plot(beta.truth, history.beta(:,1), 'o')
-plot(beta.truth, beta.lasso, 'o')
-title('True beta vs. estimated beta with lasso', 'fontsize', FS)
-xlabel('True beta values', 'fontsize', FS)
-ylabel('Estimated beta with lasso', 'fontsize', FS)
-hold on 
-plot(range,range)
-hold off
-
-%%
-% compute the difference between estimate vs. truth over iterations 
-diff = bsxfun(@minus, history.beta, beta.truth);
-% preallocate 
-diffnorm = nan(size(diff,2),1);
-ydev = nan(size(diff,2),1);
-acc = nan(size(diff,2),1);
-
-for i = 1 : size(diff,2)
-    diffnorm(i) = norm(beta.truth-diff(:,i), 2);
-    ydev(i) = norm(y - X * history.beta(:,i),2);
-    acc(i) = sum(y == sign(X * history.beta(:,i)))/length(y);
+plotPerformance(beta.truth, history, X,y)
 end
-
-subplot(2,2,3)
-plot(diffnorm)
-title('Inf-Norm of difference between estimate and truth')
-
-subplot(2,2,4)
-plot(ydev)
-title('2-Norm of difference between y and X beta')
