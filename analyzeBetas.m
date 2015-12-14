@@ -10,11 +10,17 @@ end
 
 subplot(1,2,1)
 plot(nnzs.raw, accuracy.raw, 'linewidth', 1.5)
-title('LASSO: Accuracy-Sparsity trade off', 'fontsize' ,14)
+title('LASSO, raw data', 'fontsize' ,14)
 xlabel('Number of non-zero feautres', 'fontsize' ,14)
 ylabel('Cross Validated Accuracy', 'fontsize' ,14)
+ylim([.5 .85])
+
 subplot(1,2,2)
 plot(nnzs.norm, accuracy.norm, 'linewidth', 1.5)
+title('LASSO, normalized data', 'fontsize' ,14)
+xlabel('Number of non-zero feautres', 'fontsize' ,14)
+ylabel('Cross Validated Accuracy', 'fontsize' ,14)
+ylim([.5 .85])
 
 %% plot the data 
 for i = 1 : numel(DELTA)
@@ -29,12 +35,17 @@ end
 % plot 
 subplot(1,2,1)
 plot(nnzs.rawrw, accuracy.rawrw, 'linewidth', 1.5)
-title('Reweighted LASSO: Accuracy-Sparsity trade off', 'fontsize' ,14)
+title('Reweighted LASSO, raw data', 'fontsize' ,14)
 xlabel('Number of non-zero feautres', 'fontsize' ,14)
 ylabel('Cross Validated Accuracy', 'fontsize' ,14)
+ylim([.5 .85])
+
 subplot(1,2,2)
 plot(nnzs.normrw, accuracy.normrw, 'linewidth', 1.5)
-
+title('Reweighted LASSO, normalized data', 'fontsize' ,14)
+xlabel('Number of non-zero feautres', 'fontsize' ,14)
+ylabel('Cross Validated Accuracy', 'fontsize' ,14)
+ylim([.5 .85])
 
 %% analysis on "best" beta 
 % select the beta with best accuracy, then wit highest sparsity
